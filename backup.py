@@ -20,7 +20,7 @@ load_dotenv()
 log = logging.getLogger(__name__)
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
-GITHUB_REPO = os.getenv("GITHUB_REPO")
+GITHUB_REPO = os.getenv("GITHUB_REPO", "m3h3di/claude-vault-backups")
 GITHUB_BRANCH = os.getenv("GITHUB_BRANCH", "main")
 BACKUP_FOLDER = os.getenv("BACKUP_FOLDER", "backups")
 STATE_FILE = f"{BACKUP_FOLDER}/.state.json"

@@ -4,6 +4,11 @@ Automatically backs up all Claude.ai conversations and projects to GitHub as mar
 Runs on a schedule, auto-refreshes session when it expires, and skips creating
 duplicate snapshots when content is unchanged.
 
+Default backup target:
+- `GITHUB_REPO=m3h3di/claude-vault-backups`
+- `GITHUB_BRANCH=main`
+- `BACKUP_FOLDER=backups`
+
 ## Deploy on Google Cloud Run
 
 Cloud Run service is not the right fit for this repo because `scheduler.py` is a long-running loop and Cloud Run services are designed to handle HTTP requests. For Google Cloud, deploy `backup.py` as a **Cloud Run Job** and trigger it on a schedule with **Cloud Scheduler**.
@@ -40,7 +45,7 @@ printf '%s' 'your-session-key' | gcloud secrets create CLAUDE_SESSION --data-fil
 printf '%s' 'you@example.com' | gcloud secrets create CLAUDE_EMAIL --data-file=-
 printf '%s' 'your-password' | gcloud secrets create CLAUDE_PASSWORD --data-file=-
 printf '%s' 'ghp_xxx' | gcloud secrets create GITHUB_TOKEN --data-file=-
-printf '%s' 'your-username/claude-vault' | gcloud secrets create GITHUB_REPO --data-file=-
+printf '%s' 'm3h3di/claude-vault-backups' | gcloud secrets create GITHUB_REPO --data-file=-
 ```
 
 ### 3. Create the Cloud Run Job
