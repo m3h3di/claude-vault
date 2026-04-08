@@ -33,7 +33,10 @@ GH_BASE = "https://api.github.com"
 def claude_headers():
     return {
         "cookie": f"sessionKey={os.getenv('CLAUDE_SESSION')}",
+        "accept": "application/json, text/plain, */*",
         "content-type": "application/json",
+        "origin": "https://claude.ai",
+        "referer": "https://claude.ai/chats",
         "user-agent": "Mozilla/5.0",
     }
 
@@ -49,6 +52,19 @@ def refresh_session():
         raise
 
 
+def log_claude_error(response):
+    body = response.text.strip()
+    if len(body) > 500:
+        body = body[:500] + "..."
+    log.error(
+        "Claude API request failed: %s %s -> %s %s",
+        response.request.method,
+        response.url,
+        response.status_code,
+        body or "<empty body>",
+    )
+
+
 def claude_get(path: str):
     url = f"{CLAUDE_BASE}/{path}"
     r = requests.get(url, headers=claude_headers(), timeout=15)
@@ -56,6 +72,8 @@ def claude_get(path: str):
         log.warning("Session expired - refreshing...")
         refresh_session()
         r = requests.get(url, headers=claude_headers(), timeout=15)
+    if r.status_code >= 400:
+        log_claude_error(r)
     r.raise_for_status()
     return r.json()
 
