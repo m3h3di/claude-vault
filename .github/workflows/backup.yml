@@ -1,0 +1,36 @@
+name: Claude Vault Backup
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # every hour - change to '0 0 * * *' for daily
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install requests python-dotenv playwright
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: Run backup
+        env:
+          CLAUDE_SESSION: ${{ secrets.CLAUDE_SESSION }}
+          CLAUDE_EMAIL: ${{ secrets.CLAUDE_EMAIL }}
+          CLAUDE_PASSWORD: ${{ secrets.CLAUDE_PASSWORD }}
+          GITHUB_TOKEN: ${{ secrets.BACKUP_GITHUB_TOKEN }}
+          GITHUB_REPO: ${{ secrets.GITHUB_REPO }}
+          GITHUB_BRANCH: main
+          BACKUP_FOLDER: backups
+        run: python backup.py
